@@ -1,0 +1,104 @@
+<script setup>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { useToast } from "primevue/usetoast";
+import { ToastSeverity } from "primevue/api";
+
+const props = defineProps({
+    suplier: {
+        required: true,
+        type: Object,
+    },
+});
+
+const form = useForm({
+    kodespl: props.suplier.kodespl,
+    namaspl: props.suplier.namaspl,
+});
+
+const toast = useToast();
+
+const submit = (id) => {
+    form.patch(route("suplier.update", id), {
+        onFinish: () => form.reset(),
+        onSuccess: () =>
+            toast.add({
+                severity: ToastSeverity.SUCCESS,
+                summary: "Success",
+                detail: "Suplier data telah diupdate database",
+                life: 2000,
+            }),
+    });
+};
+</script>
+
+<template>
+    <Head title="Suplier" />
+
+    <AuthenticatedLayout>
+        <template #header>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                Edit Suplier
+            </h2>
+        </template>
+
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div
+                    class="p-6 bg-white overflow-hidden shadow-sm sm:rounded-lg"
+                >
+                    <!-- Content -->
+                    <Link :href="route('suplier.index')">
+                        <PrimaryButton> Back </PrimaryButton>
+                    </Link>
+
+                    <form
+                        @submit.prevent="submit(props.suplier.id)"
+                        class="mt-6 space-y-4"
+                    >
+                        <div>
+                            <InputLabel for="kodespl" value="Kode Suplier" />
+                            <TextInput
+                                id="kodespl"
+                                type="text"
+                                class="mt-1 block w-full"
+                                v-model="form.kodespl"
+                                required
+                            />
+                            <InputError
+                                class="mt-2"
+                                :message="form.errors.kodespl"
+                            />
+                        </div>
+
+                        <div>
+                            <InputLabel for="namaspl" value="Nama Suplier" />
+                            <TextInput
+                                id="namaspl"
+                                type="text"
+                                class="mt-1 block w-full"
+                                v-model="form.namaspl"
+                                required
+                            />
+                            <InputError
+                                class="mt-2"
+                                :message="form.errors.namaspl"
+                            />
+                        </div>
+
+                        <PrimaryButton
+                            :class="{ 'opacity-25': form.processing }"
+                            :disabled="form.processing"
+                        >
+                            Submit
+                        </PrimaryButton>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </AuthenticatedLayout>
+</template>
